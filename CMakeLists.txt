@@ -14,5 +14,5 @@ add_definitions(${OpenCV_DEFINITIONS})
 file(GLOB project_SRCS src/*.cpp) 
 
 # Add project executable
-add_executable(webcam ${project_SRCS})
-target_link_libraries(webcam ${OpenCV_LIBRARIES})
+add_executable(sudoko ${project_SRCS})
+target_link_libraries(sudoko ${OpenCV_LIBRARIES})
