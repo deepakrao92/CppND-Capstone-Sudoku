@@ -37,7 +37,7 @@ class TrainOCR
     //Define getters for static strings
     static const string& getDatasetPath()
     {
-        static const string _dataset_path = "../resource/spaced_data.png";
+        static const string _dataset_path = "../images/spaced_data.png";
         return _dataset_path;
     }
     

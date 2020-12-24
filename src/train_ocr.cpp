@@ -10,12 +10,6 @@ TrainOCR::~TrainOCR()
 
 Mat TrainOCR::deskew(Mat& img)
 {
-    /**
-     * @brief De-Skewing Check
-     * @in: Input: Skewed image - Matrix
-     * @out: De-sweked image - Matrix
-    */
-
     Moments m = moments(img);
     if(abs(m.mu02)< 1e-2) {
         return img.clone();
@@ -125,12 +119,6 @@ void TrainOCR::VectortoMatrix(vector<vector<float> > &trainHOG, vector<vector<fl
 
 void TrainOCR::SVMParams(SVM *SVM)
 {
-    /**
-    * @Algorithm: Support Vector Machines (SVM)
-    * @description: SVMs divide space using planes based on class labels.
-    * @param: C - Choose what provides the best classification on a held out test set.
-    * **/
-
     cout << "Kernel type     : " << SVM->getKernelType() << endl;
     cout << "Type            : " << SVM->getType() << endl;
     cout << "C               : " << SVM->getC() << endl;
@@ -202,7 +190,7 @@ void TrainOCR::TrainSaveModel()
     
     //Init, Train, Test, Predict and Evaluate. 
     Mat testResponse;
-    float C = 12.5;
+    float C = 10; // 12.5
     float gamma = 0.5;
     
     Ptr<SVM> model = SVMInit(C, gamma);

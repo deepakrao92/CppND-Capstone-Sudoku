@@ -1,17 +1,12 @@
 #include "digit_recogniser.hpp"
 #include "train_ocr.hpp"
 #include "image_processor.hpp"
+#include <experimental/filesystem>
 
 DigitRecogniser::DigitRecogniser()
 {
     // Define and initialize variables
     _trained_model_path = "../results/SVMClassifierModel.yml";
-    
-    // Load Trained Model
-    _SvM = Algorithm::load<SVM>(_trained_model_path);   // TODO: Have to change this, 
-                                                        // should not be in constructor
-                                                        // as it is loading a file
-
 }
 
 DigitRecogniser::~DigitRecogniser()
@@ -22,7 +17,7 @@ void DigitRecogniser::LoadSubGrids(vector<Mat> &subGrids, ImageProcessor* imageP
 {   
     _img = imread(imageProcessor->save_path, IMREAD_GRAYSCALE);
     // TODO: change to _img = imageProcessor->procImage; 
-    bool showDigit = true;
+    bool showDigit = false;
     int imgCount = 0;
     int n = 20; // What is n 
 
@@ -48,7 +43,6 @@ void DigitRecogniser::LoadSubGrids(vector<Mat> &subGrids, ImageProcessor* imageP
                     cv::waitKey(0);
             }
             
-            digitImg = this->FloodFill(digitImg, kernel);
             resize(digitImg,digitImg,Size(20,20)); // As training set was 20x20 
             cv::erode(digitImg, digitImg, kernel);
             
@@ -104,24 +98,28 @@ void DigitRecogniser::ReprojectOnImage(std::string savePath, shared_ptr<vector<v
     {int colCount{0};
         for(int j = 0; j < img.cols; j = j + imageProcessor->gridProperties.cellHeight)
         {  
-            putText(img, to_string(Sudoku->at(rowCount).at(colCount)), Point(j+5,i+45), FONT_HERSHEY_SIMPLEX, 1, Scalar(0,0,255), 2);
-            imwrite(imageProcessor->reprojection_path, img);
+            putText(img, to_string(Sudoku->at(rowCount).at(colCount)), Point(j+5,i+45), FONT_HERSHEY_SCRIPT_SIMPLEX, 1, Scalar(0,0,255), 2);
             colCount++;
         }
         rowCount++;
     }
+    imwrite(imageProcessor->reprojection_path, img);
 }
 
 std::vector<std::vector<int>> DigitRecogniser::PredictDigits(ImageProcessor* imageProcessor, TrainOCR* trainOCR)
 {  
+    bool modelExists = std::experimental::filesystem::exists(_trained_model_path);
+    
     //Check if SVM Trained-model exists. Otherwise, re-train model.
-    if(_SvM->isTrained()) {
+    if(modelExists) {
+        _SvM = Algorithm::load<SVM>(_trained_model_path);
         cout << "Found OCR Trained Model! No re-training necessary..\n"; 
         }
         
     else {
         cout << "Could not find an existing trained-model. Program will train the OCR-network before character-recognition..\n";
         trainOCR->TrainSaveModel();
+        _SvM = Algorithm::load<SVM>(_trained_model_path);
         cout << "Training Successful!\n"; }
     
     vector <Mat> subGrids;
@@ -148,58 +146,11 @@ std::vector<std::vector<int>> DigitRecogniser::PredictDigits(ImageProcessor* ima
         vector<int> row{};
     
         for(int j = 0; j < 9; j++){
-            // if(testResponse.at<float>(inc,0) == 10)
-            // {
-            //     row.push_back(0);
-            // }
-            // else{
-                row.push_back(testResponse.at<float>(inc,0));
-            // }
+            row.push_back(testResponse.at<float>(inc,0));
             inc++;
         }
         sudoku.push_back(row);
     }
-
-    return sudoku; 
+    return sudoku;
 }
 
-cv::Mat& DigitRecogniser::FloodFill(cv::Mat& img, cv::Mat kernel){
-    cv::erode(img,img, kernel);
-    int max=-1;
-    cv::Point maxPt;
-
-    for(int y=0;y<img.rows;y++){
-        uchar *row = img.ptr(y);
-        for(int x=0;x<img.cols;x++){
-            if(row[x]>=128){
-                int area = cv::floodFill(img, cv::Point(x,y), CV_RGB(0,0,64));
-                
-                
-                if(area>max) // The outer grid is one big connected blob with the biggest area
-                {
-                    maxPt = cv::Point(x,y);
-                    max = area;
-                }
-            }
-        }
-    }
-
-    if(max != -1)
-        cv::floodFill(img, maxPt, CV_RGB(255,255,255)); // Fill the outer grid pixels with white
-
-    // Turn remaining pixels to black
-    for(int y=0;y<img.rows;y++){
-        uchar *row = img.ptr(y);
-        for(int x=0;x<img.cols;x++){
-            if(row[x]==64 && x!=maxPt.x && y!=maxPt.y) // Fill black for only gray pixels
-            {
-                int area = floodFill(img, cv::Point(x,y), CV_RGB(0,0,0));
-            }
-        }
-    }
-    
-    // Dilate the image
-    cv::dilate(img, img, kernel);
-
-    return img;
-}

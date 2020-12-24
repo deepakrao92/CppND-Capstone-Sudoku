@@ -20,9 +20,8 @@ private:
 public:
     Sudoku(std::shared_ptr<std::vector<std::vector<int>>> inputGrid);
     ~Sudoku();
-    bool solveBoard();
+    bool SolveBoard();
     void PrintBoard();
-    void Test();
 
     std::shared_ptr<std::vector<std::vector<int>>> getSolution(){
         return _sudokuOutput;

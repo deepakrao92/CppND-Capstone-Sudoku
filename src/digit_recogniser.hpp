@@ -1,6 +1,12 @@
 #ifndef DIGIT_RECOGNISER_H_
 #define DIGIT_RECOGNISER_H_
 
+/**
+ * @basedon: OpenCV Tutorial, Satya Mallick
+ * @description: OCR - Handwritten digits
+ * @link: https://www.learnopencv.com/handwritten-digits-classification-an-opencv-c-python-tutorial/
+**/
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string>

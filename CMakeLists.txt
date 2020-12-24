@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11.3)
 
 # set(CMAKE_CXX_STANDARD 17)
 project(Sudoko)
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++17 ")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++17")
 
 find_package(OpenCV 4.1 REQUIRED)
 
@@ -15,4 +15,4 @@ file(GLOB project_SRCS src/*.cpp)
 
 # Add project executable
 add_executable(sudoko ${project_SRCS})
-target_link_libraries(sudoko ${OpenCV_LIBRARIES})
+target_link_libraries(sudoko ${OpenCV_LIBRARIES} stdc++fs)

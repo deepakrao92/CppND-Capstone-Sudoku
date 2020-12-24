@@ -48,7 +48,7 @@ bool Sudoku::IsValid(int row, int col, int num){
     return !ColumnCheck(col, num) && !RowCheck(row, num) && !SubGridCheck(row - row%3, col - col%3, num); 
 }
 
-bool Sudoku::solveBoard(){
+bool Sudoku::SolveBoard(){
     int row, col;
     // Check for empty spaces, if none return true
     if(!IsCellEmpty(row, col)){
@@ -59,7 +59,7 @@ bool Sudoku::solveBoard(){
     for(int num = 1; num <= 9; num++){
         if(IsValid(row, col, num)){
             _sudokuOutput->at(row).at(col) = num;
-            if(solveBoard() == true)
+            if(SolveBoard() == true)
                 return true;
             _sudokuOutput->at(row).at(col) = 10;       
         }
@@ -68,6 +68,7 @@ bool Sudoku::solveBoard(){
 }
 
 void Sudoku::PrintBoard(){ //print the sudoku grid after solve
+    std::cout << "\nSolution:\n\n";
     for (int row = 0; row < _gridSize; row++){
       for (int col = 0; col < _gridSize; col++){
          if(col == 3 || col == 6)

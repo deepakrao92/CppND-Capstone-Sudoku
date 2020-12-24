@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Preprocess image
+    // Preprocess image to extract outer grid and pass this cropped image to 
     ImageProcessor image(argv[1]);
     image.ProcessImage();
     image.PrintProperties();
@@ -28,16 +28,17 @@ int main(int argc, char* argv[])
     TrainOCR trainOCR;
     std::shared_ptr<std::vector<std::vector<int>>> unsolved;
     unsolved = std::make_shared<std::vector<std::vector<int>>>(digits.PredictDigits(&image, &trainOCR));
-    
+
+    // Image with classifications
     digits.ReprojectOnImage(image.save_path, unsolved, &image);
     
-    // Sudoku
+    // Solve Sudoku
     Sudoku board(unsolved);
-    if(board.solveBoard() == true){
+    if(board.SolveBoard() == true){
         std::shared_ptr<std::vector<std::vector<int>>> solved = board.getSolution();
         board.PrintBoard();
         // Reproject the solution
-        // digits.ReprojectOnImage(image.save_path, solved, &image);
+        digits.ReprojectOnImage(image.save_path, solved, &image);
     }
     else
     {

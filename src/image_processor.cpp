@@ -1,7 +1,7 @@
 #include <iostream>
 #include "image_processor.hpp"
 
-#define GAUSSIAN_KERNEL 11          // 
+#define GAUSSIAN_KERNEL 11          // 11
 #define ADAP_THRESH_CONSTANT 2      // 2
 #define ADAP_THRESH_BLOCKSIZE 5     // 5
 
@@ -36,8 +36,6 @@ void ImageProcessor::PrintProperties(void)
     << "         cw: " << gridProperties.cellWidth << " ,ch: " << gridProperties.cellHeight << std::endl;
 }
 
-/*++++++++++++++++++++++++++++++ Private ++++++++++++++++++++++++++++++*/
-
 void ImageProcessor::BasicPreProcessing(int gaussianKernel,cv::Mat &kernel,cv::Mat& img)
 {
     cv::GaussianBlur(img, procImage, cv::Size(gaussianKernel, 
@@ -50,21 +48,21 @@ void ImageProcessor::BasicPreProcessing(int gaussianKernel,cv::Mat &kernel,cv::M
     cv::bitwise_not(procImage, procImage);
 }
 
-int ImageProcessor::closestNumberDivByNine(int n, int m = 9) 
+int ImageProcessor::closestNumberDivByNine(int dividend, int divisor = 9) 
 { 
-    int q = n / m; 
+    int quo = dividend / divisor; 
       
-    // 1st possible closest number 
-    int n1 = m * q; 
+    // 1st closest number 
+    int n1 = divisor * quo; 
       
-    // 2nd possible closest number 
-    int n2 = (n * m) > 0 ? (m * (q + 1)) : (m * (q - 1)); 
+    // 2nd closest number 
+    int n2 = (divisor * divisor) > 0 ? (dividend * (dividend + 1)) : (divisor * (dividend - 1)); 
       
-    // if true, then n1 is the required closest number 
-    if (abs(n - n1) < abs(n - n2)) 
+    // if true, then n1 is closest 
+    if (abs(dividend - n1) < abs(dividend - n2)) 
         return n1; 
       
-    // else n2 is the required closest number     
+    // else n2 is closest
     return n2;     
 }
 
@@ -116,11 +114,6 @@ void ImageProcessor::ResizeImage(cv::Rect& boundingBox){
     gridProperties.cellHeight = gridProperties.boundingBox.height/9;
 
     this->BasicPreProcessing(11, _kernel, procImage);
-    this->SaveProcessedFile(save_path, procImage);
-}
-
-void ImageProcessor::SaveProcessedFile(std::string path, cv::Mat& img)
-{
-    cv::imwrite(path, img);
+    cv::imwrite(save_path, procImage);
 }
 

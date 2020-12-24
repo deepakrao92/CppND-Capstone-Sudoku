@@ -19,11 +19,9 @@ private:
     int closestNumberDivByNine(int n, int m);
     cv::Rect FindGridContours();
     void ResizeImage(cv::Rect& boundingBox);
-    void SaveProcessedFile(std::string path, cv::Mat& img);    
        
 public:
     cv::Mat procImage;
-    std::string image_path = "../images/sudoku.png";
     std::string save_path = "../results/ProcessedImage.png";
     std::string reprojection_path = "../results/ReprojectedImage.png";
     std::string dataset_path = "../images/digits.png";
