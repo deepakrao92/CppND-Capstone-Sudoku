@@ -2,20 +2,34 @@
 
 An application that can solve a Sudoko puzzle using C++ and the OpenCV library. 
 
+This project aims to implement the concepts learnt during the Udacity C++ course as well as experiment around in the field of image processing and classification. As a starting step, a Sudoku was a nice way to delve in and explore techniques used in recognition of digits as well as learn about backtracing algorithms which can be used to solve the puzzle itself.
+
 ![Screenshot of puzzle after initial pre-processing](extra/ProcessedImage.png "Title")
 
 ## Project Description
 
-The application when run accepts the path to a Sudoku image.
+The application accepts an image of a Sudoku puzzle, recognize the digits and return the solved puzzle as the output. 
 
-The project is structured as follows:
+The implementation was therefore broken down into separate logical classes to organize the code accordingly.
 
-The project aims to cover the concepts taught as a part of the C++ Nanodegree.
+The project contains classes for the following tasks
+* `ImageProcessor` handles the pre-processing steps needed to identify the Sudoku grid in an image, localise it and extract the Region of Interest for digit recognition. 
+* `DigitRecogniser` accepts the processed image with the Sudoku grid to classify the digits and store them in a `vector<vector<int>>`.
+* `TrainOCR`, runs for the first time if the trained model is not present. It used Histogram of Oriented Gradients (HoG) and Support Vector Machines (SVM) to train the classifier on the MNIST dataset. 
+* `Sudoku` , it contains the logic for solving the puzzle based on backtracking algorithm. It accepts the vector of identified digits and after solving returns a vector of int's as the solution which is printed on the console output.
+
+### Program Flow
+
+`main.cpp` is the main entry point for the application.
+
+* The program checks if the image was specified as the second argument while running the application and raises an error to the user along with usage instructions is not specified.
+* The image is then passed to the `ImageProcessor` object to perform some processing operations that identifies the outer grid of the puzzle.
+* The objects for the `TrainOCR` & `DigitRecogniser` are created and the processed image is passed as an argument to the `predictDigits()` function of the `DigitRecogniser` class.
+* After the classification of the digits, a vector is returned by `DigitRecogniser` class which is then passed on to the `Sudoku` object which calls the `SolveBoard` function to find a solution.
+* If a solution exists, it writes the solution on a copy of the image and saves it as well as displays the solution on the console output. Otherwise, prints "Solution not found" on the output.
 
 ### Assumptions:
-* No perspective or warping corrections needed in this version of the application
-* Image will have thick lines for outer edges as well as for sub-grids
-
+* No perspective or warping corrections needed in this version of the application as the images are digital ones used from the internet. 
 
 ## Dependencies for running the project locally:
 * cmake >= 3.11.3
@@ -33,9 +47,12 @@ The project aims to cover the concepts taught as a part of the C++ Nanodegree.
 ## Basic Build Instructions
 
 1. Clone this repository
-2. Create a folder named 'build' in the top level directory: 'mkdir build && cd build'
-3. Compile: 'cmake .. && make'
-4. Run: './sudoko <path_to_the_sudoku_image>'
+2. Create a folder named `build` in the top level directory: `mkdir build && cd build`
+3. Compiling the application:
+ `cmake .. && make`
+4. Running the application: 
+	`./sudoko <path_to_the_sudoku_image>`
+	Example:  `./sudoku ../images/sudoku.jpeg`
 
 ## Udacity Capstone Project Requirements – Rubric Points Addressed
 
@@ -57,17 +74,17 @@ A short description of how and where the project requirements are fulfilled.
 * The project demonstrates an understanding of C++ functions and control structures
   * Yes.
 * The project reads data from a file and process the data, or the program writes data to a file
-  * Yes, it accepts an image as input, processes it further and when solution is calculated, stores the results in new image
+  * Yes, it accepts an image as input, processes it further and when solution is calculated, stores the results as `results/ProcessedImage.png` and `results/ReprojectedImage.png`
 * The project accepts user input and processes the input
   * Yes. The user must provide the path to the image of the Sudoku puzzle as an argument.
 
 ### 4. Object Oriented Programming
 * The project uses Object Oriented Programming techniques
-  * Yes. 
+  * Yes. The project is organized in 4 different classes namely `ImageProcessor`, `DigitRecogniser`, `TrainOCR`, `Sudoku`. The short description of the purpose of these classes have been described in the project description section.
 * Classes use appropriate access specifiers for class members
-  * Yes.
+  * Yes. As per the purpose of the member and/or functions, getters or setters have been implemented.
 * Class constructors utilize member initialization lists
-  * Yes.
+  * Yes. 
 * Classes abstract implementation details from their interfaces
   * Yes.
 * Classes encapsulate behavior
@@ -84,7 +101,7 @@ A short description of how and where the project requirements are fulfilled.
 ### 5. Memory Management
 
 * The project makes use of references in function declarations
-  * Yes.
+  * Yes. In most places as the image is loaded as a `cv::Mat` function, they have been passed around as references.
 * The project uses destructors appropriately
   * Yes.
 * The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate
@@ -97,7 +114,7 @@ A short description of how and where the project requirements are fulfilled.
   * Yes, smart pointers are used as well as raw pointers.
 
 ### 6. Concurrency
-* The project uses multithreading
+* The project uses multi-threading
   * No.
 * A promise and future is used in the project
   * No.
@@ -108,6 +125,19 @@ A short description of how and where the project requirements are fulfilled.
 
 ## Acknowledgements
 
+As mentioned earlier, one of the goals was also to learn about the implementation of an image classifier. Hence, the `TrainOCR` class and some parts of the `DigitRecogniser` class have therefore been adapted from the OpenCV tutorial on recognising handwritten digits trained on the MNIST dataset. The link for this tutorial can be found [here](https://www.learnopencv.com/handwritten-digits-classification-an-opencv-c-python-tutorial/). The code has been taken largely as is and the acknowledgements have also been mentioned in the source and header files accordingly.
+
+## Known Issues
+
+The current version of the application meets the goals of the capstone project and some fine-tuning to address these issues will be done in future.
+
+1. The classifier sometimes wrongly classifies the digits. 
+	It may happen due to the font or resolution of the image. The images used have digital digits and the classifier is trained on the handwritten digits classifier. 
+2. Misclassification of blank spaces
+	The blank spaces are trained to be classified as number 10. Sometimes if the blank spaces contain some stray pixels, it tends to predict a digit, which causes wrongly detected puzzle and leads to no solution
+
 ## Future Extensions
-Initially, it will detect and solve puzzles from a static image and later on try to extend the project for real-time solution using a video stream
+1. Improve the classification part of the application to get accurate predictions.
+2. Extend the project for real-time solution using a camera/video stream.
+4. Convert it into a working Android application that can solve the puzzle and display the solution as an overlay on top of the image.
 
